@@ -1320,7 +1320,7 @@ function MiniLineChart({ scores, width=160, height=50 }) {
   return (
     <svg width={width} height={height} style={{ overflow:"visible" }}>
       <defs>
-        <linearGradient id={`grad-${scores.join("-")}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={"grad-" + scores.join("-")} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#4caf50" stopOpacity="0.3" />
           <stop offset="100%" stopColor="#4caf50" stopOpacity="0.0" />
         </linearGradient>
@@ -1329,7 +1329,7 @@ function MiniLineChart({ scores, width=160, height=50 }) {
       <line x1="0" y1={height - 8 - (0.9 * (height-16))} x2={width} y2={height - 8 - (0.9 * (height-16))}
         stroke="rgba(76,175,80,0.2)" strokeWidth="1" strokeDasharray="3,3" />
       {/* Area fill */}
-      <path d={area} fill={`url(#grad-${scores.join("-")})`} />
+      <path d={area} fill={"url(#grad-" + scores.join("-") + ")"} />
       {/* Line */}
       <polyline points={polyline} fill="none" stroke="#4caf50" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       {/* Dots */}
@@ -1885,7 +1885,7 @@ function App() {
       )}
       {screen === "quiz" && selectedLevel && (
         <QuizScreen
-          key={`${selectedLevel.id}-${retake}`}
+          key={selectedLevel.id + "-" + retake}
           level={selectedLevel}
           onFinish={handleFinishQuiz}
           onBack={() => setScreen("teaching")}
