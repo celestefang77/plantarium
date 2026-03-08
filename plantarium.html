@@ -57,13 +57,25 @@
       try { localStorage.setItem("prog:" + name, JSON.stringify(prog)); } catch {}
     }
 
-    async function submitScore(user, dName, lid, ltitle, score, passed) {
+    const _submitted = new Set();
+    function submitScore(user, dName, lid, ltitle, score, passed) {
+      const dedupKey = user + "|" + lid + "|" + score;
+      if (_submitted.has(dedupKey)) return;
+      _submitted.add(dedupKey);
+      setTimeout(() => _submitted.delete(dedupKey), 5000);
       try {
-        await fetch(APPS_SCRIPT_URL + "?action=submitScore&username=" + encodeURIComponent(user) +
-          "&displayName=" + encodeURIComponent(dName) + "&levelId=" + encodeURIComponent(lid) +
-          "&levelTitle=" + encodeURIComponent(ltitle) + "&score=" + score + "&passed=" + passed,
-          { method:"GET", mode:"no-cors" });
-      } catch {}
+        const cb = "sc_" + Date.now();
+        const s = document.createElement("script");
+        window[cb] = () => { delete window[cb]; try { document.body.removeChild(s); } catch(e){} };
+        s.onerror = () => { delete window[cb]; try { document.body.removeChild(s); } catch(e){} };
+        s.src = APPS_SCRIPT_URL + "?action=submitScore&callback=" + cb +
+          "&username=" + encodeURIComponent(user) +
+          "&displayName=" + encodeURIComponent(dName) +
+          "&levelId=" + encodeURIComponent(lid) +
+          "&levelTitle=" + encodeURIComponent(ltitle) +
+          "&score=" + score + "&passed=" + passed;
+        document.body.appendChild(s);
+      } catch(e) {}
     }
 
     function jsonpLogin(user, pass) {
