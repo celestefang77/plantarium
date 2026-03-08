@@ -122,9 +122,11 @@
         setLoading(true); setErr("");
         try {
           const data = await jsonpLogin(user.trim(), pass.trim());
-          if (data && data.success) {
+          if (data && data.status === "ok") {
             const prog = loadProgress(user.trim());
             onLogin(user.trim(), data.displayName || user.trim(), prog);
+          } else if (data && data.status === "disabled") {
+            setErr(data.message);
           } else {
             setErr(data && data.message ? data.message : "帳號或密碼錯誤");
           }
