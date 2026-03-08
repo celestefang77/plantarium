@@ -50,12 +50,46 @@ const LEVELS_RAW = '[{"id":"level_01","title":"屏風／吸音板使用","emoji"
 // ─── GOOGLE SHEETS INTEGRATION ────────────────────────────────────────────────
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqJotAxyCtabaOnqnQZy7LZaEcLmpNpX_-t9zViUnedKBjgUa_BwLxaMgv0M9-K0L9/exec";
 
+function jsonpRequest(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = "cb_" + Math.random().toString(36).slice(2);
+    const url = APPS_SCRIPT_URL +
+      "?callback=" + cbName +
+      "&action=" + encodeURIComponent(params.action) +
+      "&username=" + encodeURIComponent(params.username || "") +
+      "&password=" + encodeURIComponent(params.password || "");
+    
+    window[cbName] = (data) => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    
+    const script = document.createElement("script");
+    script.src = url;
+    script.onerror = () => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      reject(new Error("JSONP failed"));
+    };
+    setTimeout(() => {
+      if (window[cbName]) {
+        delete window[cbName];
+        try { document.body.removeChild(script); } catch(e) {}
+        reject(new Error("Timeout"));
+      }
+    }, 10000);
+    document.body.appendChild(script);
+  });
+}
+
 async function submitScore(username, displayName, levelId, levelTitle, score, passed, totalQ) {
   try {
     await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "submitScore", username, displayName, levelId, levelTitle, score, passed, totalQ, timestamp: new Date().toISOString() }),
+      mode: "no-cors"
     });
   } catch (e) {}
 }
@@ -109,12 +143,11 @@ function LoginScreen({ onLogin }) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "login", username: username.trim(), password: password.trim() }),
+      const data = await jsonpRequest({
+        action: "login",
+        username: username.trim(),
+        password: password.trim()
       });
-      const data = await res.json();
       if (data.status === "ok") {
         const progress = await loadProgress(username.trim());
         onLogin(username.trim(), data.displayName, progress);
