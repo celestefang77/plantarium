@@ -458,9 +458,10 @@ function LoginScreen({ onLogin }) {
 
 // ─── LEVEL MAP ────────────────────────────────────────────────────────────────
 function LevelMap({ levels, progress, playerName, displayName, onSelectLevel, onOpenDashboard, onLogout }) {
-  const passedCount = Object.values(progress).filter(p => p.passed).length;
+  const regularLevels = levels.filter(l => l.id !== "level_19");
+  const passedCount = regularLevels.filter(l => progress[l.id]?.passed).length;
   const badges = getBadges(progress);
-  const pct = Math.round((passedCount / 18) * 100);
+  const pct = Math.round((passedCount / regularLevels.length) * 100);
 
   return (
     <div style={{ minHeight:"100vh", background:C.bg, fontFamily:"'Noto Sans TC', sans-serif", color:C.text }}>
@@ -542,10 +543,14 @@ function LevelMap({ levels, progress, playerName, displayName, onSelectLevel, on
           return (
             <div key={level.id} onClick={() => onSelectLevel(level)} className="card-hover"
               style={{
-                background: passed
+                background: level.id === "level_19"
+                  ? (attempted ? "rgba(255,213,79,0.08)" : "rgba(255,213,79,0.04)")
+                  : passed
                   ? "linear-gradient(135deg, rgba(76,175,80,0.18), rgba(56,142,60,0.1))"
                   : attempted ? "rgba(255,152,0,0.08)" : C.bgCard,
-                border: passed ? `1px solid rgba(76,175,80,0.35)`
+                border: level.id === "level_19"
+                  ? (attempted ? "1px solid rgba(255,213,79,0.35)" : "1px solid rgba(255,213,79,0.15)")
+                  : passed ? `1px solid rgba(76,175,80,0.35)`
                   : attempted ? "1px solid rgba(255,152,0,0.25)" : `1px solid ${C.border}`,
                 borderRadius:"18px", padding:"20px", cursor:"pointer",
                 transition:"all 0.2s", position:"relative", overflow:"hidden",
@@ -557,17 +562,20 @@ function LevelMap({ levels, progress, playerName, displayName, onSelectLevel, on
                 borderBottomLeftRadius:"60px",
               }} />}
               <div style={{ fontSize:"26px", marginBottom:"10px" }}>{level.emoji}</div>
-              <div style={{ fontSize:"10px", color:C.textDim, marginBottom:"4px", letterSpacing:"1px" }}>
-                關卡 {String(idx+1).padStart(2,"0")}
+              <div style={{ fontSize:"10px", color: level.id === "level_19" ? "#ffd54f" : C.textDim, marginBottom:"4px", letterSpacing:"1px" }}>
+                {level.id === "level_19" ? "🎭 BONUS" : `關卡 ${String(idx+1).padStart(2,"0")}`}
               </div>
               <div style={{ fontSize:"14px", fontWeight:"600", lineHeight:"1.4", color: passed ? C.greenLight : C.text, marginBottom:"12px" }}>
                 {level.title}
               </div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                 <div style={{ fontSize:"11px", color:C.textDim }}>
-                  共{level.questions.length}題・考{drawCount}題
+                  {level.id === "level_19" ? "情境判斷・不計分" : `共${level.questions.length}題・考${drawCount}題`}
                 </div>
-                {passed ? (
+                {level.id === "level_19" ? (
+                  attempted ? <div style={{ fontSize:"11px", color:"#ffd54f" }}>✓ 已挑戰</div>
+                  : <div style={{ fontSize:"11px", color:C.textDim }}>未開始</div>
+                ) : passed ? (
                   <div style={{ fontSize:"11px", color:C.green, fontWeight:"700" }}>✓ {bestScore}分</div>
                 ) : attempted ? (
                   <div style={{ fontSize:"11px", color:"#ffb74d" }}>最高 {bestScore}分</div>
@@ -1572,9 +1580,10 @@ function ScenarioScreen({ level, onBack }) {
 }
 
 function DashboardScreen({ levels, progress, playerName, displayName, onClose }) {
-  const passedCount = Object.values(progress).filter(p => p.passed).length;
+  const regularLevels = levels.filter(l => l.id !== "level_19");
+  const passedCount = regularLevels.filter(l => progress[l.id]?.passed).length;
   const badges = getBadges(progress);
-  const pct = Math.round((passedCount / 18) * 100);
+  const pct = Math.round((passedCount / regularLevels.length) * 100);
 
   const attempted = levels.filter(l => progress[l.id]?.attempts > 0);
 
