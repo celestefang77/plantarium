@@ -153,8 +153,7 @@
         } catch(e) {
           console.error("Login error:", e.message);
           if (e.message === "script_load_failed") {
-            setErr("⚠️ 無法連到驗證伺服器（Apps Script 可能未授權匿名存取）
-請確認部署時「存取權」設為「所有人」");
+            setErr("⚠️ 無法連到驗證伺服器，請確認 Apps Script 部署時「存取權」設為「所有人」");
           } else if (e.message === "timeout") {
             setErr("⚠️ 連線逾時（8秒無回應），請稍後再試");
           } else {
