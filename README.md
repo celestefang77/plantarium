@@ -8,7 +8,7 @@
 
 👉 [點我開始闖關](https://celestefang77.github.io/plantarium/plantarium.html)
 
-帳號密碼請向主管索取。
+請按照設定的帳號密碼登入。
 
 ## 系統內容
 
