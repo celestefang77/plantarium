@@ -1854,15 +1854,8 @@ function App() {
   };
 
   return (
-    <div style={{ fontFamily: "'Noto Sans TC', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; }
-        input::placeholder { color: rgba(255,255,255,0.3); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-      `}</style>
+    <div style={{ fontFamily: "'Noto Sans TC', sans-serif", background: '#0a1a0f', minHeight: '100vh' }}>
+      <style>{globalCSS}</style>
 
       {showWelcome && <WelcomeModal displayName={displayName} onClose={() => setShowWelcome(false)} />}
       {screen === "login" && <LoginScreen onLogin={handleLogin} />}
